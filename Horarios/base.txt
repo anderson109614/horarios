@@ -7,21 +7,31 @@ Ape_Doc varchar (15) not null
 
 Create table DIAS
 (
-Id_Dia varchar (3) primary key,
+Id_Dia integer (1) primary key,
 Nom_Dia varchar (9) not null
 );
 
 Create table JORNADAS
 (
-Id_Jor number primary key,
-Id_Dia_Per varchar (3) not null references DIAS (Id_Dia),
+Id_Jor integer primary key auto_increment,
+Id_Dia_Per integer (1) not null references DIAS (Id_Dia),
 Hor_Emp date not null,
 Hor_Ter date not null,
-Ced_Doc_Per varchar (10) not null references DOCENTES (Ced_Doc)
+Ced_Doc_Per varchar (10) not null references DOCENTES (Ced_Doc),
+Des_Jor varchar(20)
+);
+
+Create table RECORDATORIOS
+(
+Id_Rec integer primary key,
+Id_Dia_Per integer (1) not null references DIAS (Id_Dia),
+hor_rec date not null,
+Ced_Doc_Per varchar (10) not null references DOCENTES (Ced_Doc),
+Des_rec varchar(20)
 );
 
 
-Create or replace procedure Contar_Horas_Pro(dia,docente,hor_empJ,hor_terJ)
+Create or replace procedure Contar_Horas_Pro(dia,docente,hor_empJ,hor_terJ,descripcion)
 Is
 Hor_empA integer := 0;
 Hor_terA integer:=0;
@@ -53,8 +63,8 @@ End loop;
 Hor_aux:=hor_terJ-hor_empJ;
 Total_horas:=Total_horas+Hor_aux;
 If Total_horas < 8 then
-Insert into jornadas (id_dia_per,hor_emp,hor_ter,ced_doc_per)
-Values (dia,hor_empJ,hor_terJ,docente);
+Insert into jornadas (id_dia_per,hor_emp,hor_ter,ced_doc_per,des_jor)
+Values (dia,hor_empJ,hor_terJ,docente,descripcion);
 Else
 Raise muchas_horasEnd if;
 Exception
