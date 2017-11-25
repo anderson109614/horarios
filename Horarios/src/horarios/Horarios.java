@@ -44,11 +44,42 @@ public class Horarios extends javax.swing.JFrame {
         } else {
             fmtHoraFin.setText("");
             fmtHoraFin.setEnabled(false);
-            
+
         }
     }
 
-    public void agregarJornada() throws HeadlessException {
+    public void agregarRecordatorio() {
+        Connection cc = cn.conectar();
+        int Id_Dia_Per;
+        String hor_rec, Ced_Doc_Per, Des_rec;
+        Id_Dia_Per = cmbDias.getSelectedIndex() + 1;
+        hor_rec = fmtHoraIni.getText();
+        Ced_Doc_Per = txtCedDoc.getText();
+        if (!txtDescripcion.getText().isEmpty()) {
+            Des_rec = txtDescripcion.getText();
+        } else {
+            Des_rec = "Sin descripción";
+        }
+        String sql = "insert into recordatorios(Id_Dia_Per, hor_rec, Ced_Doc_Per, Des_rec)"
+                + " values (?,?,?,?)";
+        try {
+            PreparedStatement psd = cc.prepareStatement(sql);
+            psd.setInt(1, Id_Dia_Per);
+            psd.setString(2, hor_rec);
+            psd.setString(3, Ced_Doc_Per);
+            psd.setString(4, Des_rec);
+
+            int n = psd.executeUpdate();
+
+            if (n > 0) {
+                JOptionPane.showMessageDialog(null, "Recordatorio agregado correctamente");
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error en la insercción: " + ex);
+        }
+    }
+
+    public void agregarJornada() {
         // TODO add your handling code here:
         Connection cc = cn.conectar();
         try {
@@ -131,20 +162,48 @@ public class Horarios extends javax.swing.JFrame {
 
     }
 
-    public void validarHoras(KeyEvent evt,JFormattedTextField texto) {
+    public boolean validarCampos() {
+        if (rdbJornada.isSelected()) {
+            if (fmtHoraIni.getText().charAt(0) == ' ') {
+                JOptionPane.showMessageDialog(null, "Ingrese la hora de inicio");
+                return false;
+            } else if (fmtHoraFin.getText().charAt(0) == ' ') {
+                JOptionPane.showMessageDialog(null, "Ingrese la hora de fin");
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            if (fmtHoraIni.getText().charAt(0) == ' ') {
+                JOptionPane.showMessageDialog(null, "Ingrese la hora de inicio");
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    public void validarEscrituraHoras(KeyEvent evt, JFormattedTextField texto) {
         // TODO add your handling code here:
         char c = evt.getKeyChar();
         int cont = 0;
-        
-        if(c > '2' && texto.getText().charAt(0)==' '){
+        boolean verif = false;
+        if (c > '2' && texto.getText().charAt(0) == ' ') {
             evt.consume();
-        }else if (texto.getText().charAt(0)=='2'){
+        } else if (texto.getText().charAt(0) == '2') {
             cont++;
         }
-        if (texto.getText().charAt(0)==' '){
+        if (texto.getText().charAt(0) == ' ') {
             cont = 0;
+            verif = false;
         }
-        if(cont > 0 && c >'0'){
+        if (cont > 0 && c > '0') {
+            evt.consume();
+        }
+        if (texto.getText().charAt(0) == '0') {
+            verif = true;
+        }
+        if (verif && c < '7') {
             evt.consume();
         }
     }
@@ -365,7 +424,6 @@ public class Horarios extends javax.swing.JFrame {
                             .addComponent(jLabel5)
                             .addComponent(fmtHoraIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(rdbRecordatorio))
-                        .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(1, 1, 1)
@@ -401,7 +459,13 @@ public class Horarios extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAgregarActionPerformed
-        agregarJornada();
+        if (validarCampos()) {
+            if (rdbJornada.isSelected()) {
+                agregarJornada();
+            } else {
+                agregarRecordatorio();
+            }
+        }
 
 
     }//GEN-LAST:event_txtAgregarActionPerformed
@@ -428,7 +492,7 @@ public class Horarios extends javax.swing.JFrame {
     }//GEN-LAST:event_rdbRecordatorioActionPerformed
 
     private void fmtHoraIniKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fmtHoraIniKeyTyped
-        validarHoras(evt, fmtHoraIni);
+        validarEscrituraHoras(evt, fmtHoraIni);
     }//GEN-LAST:event_fmtHoraIniKeyTyped
 
     /**
