@@ -23,7 +23,7 @@ Des_Jor varchar(20)
 
 Create table RECORDATORIOS
 (
-Id_Rec integer primary key,
+Id_Rec integer primary key auto_increment,
 Id_Dia_Per integer (1) not null references DIAS (Id_Dia),
 hor_rec date not null,
 Ced_Doc_Per varchar (10) not null references DOCENTES (Ced_Doc),

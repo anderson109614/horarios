@@ -7,6 +7,10 @@ package horarios;
 import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
@@ -45,6 +49,140 @@ public class Horarios extends javax.swing.JFrame {
             fmtHoraFin.setText("");
             fmtHoraFin.setEnabled(false);
 
+        }
+    }
+
+    public boolean validarHoraFinMayorHoraIni() {
+        try {
+            SimpleDateFormat parseador = new SimpleDateFormat("H:mm");
+            //Hora Inicio
+            Calendar horaIni = Calendar.getInstance();
+            Date hi = parseador.parse(fmtHoraIni.getText());
+            horaIni.setTime(hi);
+            //Hora Fin
+            Calendar horaFin = Calendar.getInstance();
+            Date hf = parseador.parse(fmtHoraFin.getText());
+            horaFin.setTime(hf);
+            //Comparando horas
+            int comp = horaIni.compareTo(horaFin);
+            //Si hora fin es mayor que inicio false
+            if (comp >= 0) {
+                JOptionPane.showMessageDialog(null, "Error: hora fin debe ser mayor a hora inicio");
+                return false;
+            }
+            return true;
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "Error de fecha: " + ex);
+            return false;
+        }
+
+    }
+
+    public boolean validarHoraRecordatorio() {
+        try {
+            SimpleDateFormat parseador = new SimpleDateFormat("H:mm");
+            SimpleDateFormat formateador = new SimpleDateFormat("H:mm");
+            //Hora Inicio
+            Calendar horaIni = Calendar.getInstance();
+            Date hi = parseador.parse(fmtHoraIni.getText());
+            horaIni.setTime(hi);
+            //Hora inicio recuperada base
+            Calendar horaIniBase = Calendar.getInstance();
+            Date hib = null;
+            Connection cc = cn.conectar();
+            String sql = "select hor_rec from recordatorios "
+                    + "where id_dia_per =" + (cmbDias.getSelectedIndex() + 1) + " "
+                    + "and ced_doc_per ='" + txtCedDoc.getText() + "'";
+            try {
+                Statement st = cc.createStatement();
+                ResultSet rs = st.executeQuery(sql);
+                while (rs.next()) {
+                    hib = parseador.parse(rs.getString("hor_rec"));
+                    horaIniBase.setTime(hib);
+                    if (horaIni.compareTo(horaIniBase) == 0) {
+                        JOptionPane.showMessageDialog(null, "Error: Hora " + formateador.format(horaIni) + " ya asignada");
+                        return false;
+                    }
+                }
+                return true;
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Error agregando recordatorio");
+                return false;
+            }
+
+
+
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "Error en las fechas: " + ex);
+            return false;
+        }
+
+    }
+
+    public boolean validarHorasJornada() {
+        try {
+            SimpleDateFormat parseador = new SimpleDateFormat("H:mm");
+            //SimpleDateFormat formateador = new SimpleDateFormat("H:mm");
+            //Hora Inicio
+            Calendar horaIni = Calendar.getInstance();
+            Date hi = parseador.parse(fmtHoraIni.getText());
+            horaIni.setTime(hi);
+            //Hora fin
+            Calendar horafin = Calendar.getInstance();
+            Date hf = parseador.parse(fmtHoraFin.getText());
+            horafin.setTime(hf);
+            //Hora inicio recuperada base
+            Calendar horaIniBase = Calendar.getInstance();
+            Date hib = null;
+
+            //Hora fin recuperada base
+            Calendar horaFinBase = Calendar.getInstance();
+            Date hfb = null;
+
+            int inicio, inicioB, finB, numH;
+            inicio = 0;
+            inicioB = 0;
+            finB = 0;
+            numH = 0;
+
+            Connection cc = cn.conectar();
+            String sql = "select hor_emp,hor_ter from recordatorios "
+                    + "where id_dia_per =" + (cmbDias.getSelectedIndex() + 1) + " "
+                    + "and ced_doc_per ='" + txtCedDoc.getText() + "'";
+            try {
+                Statement st = cc.createStatement();
+                ResultSet rs = st.executeQuery(sql);
+                while (rs.next()) {
+                    hib = parseador.parse(rs.getString("hor_emp"));
+                    horaIniBase.setTime(hib);
+                    inicioB = horaIniBase.get(Calendar.HOUR_OF_DAY);
+
+                    hfb = parseador.parse(rs.getString("hor_ter"));
+                    horaFinBase.setTime(hfb);
+                    finB = horaFinBase.get(Calendar.HOUR_OF_DAY);
+
+                    numH = finB - inicioB;
+
+                    inicio = horaIni.get(Calendar.HOUR_OF_DAY);
+                    for (int i = 0; i < numH; i++) {
+                        if (inicioB == inicio) {
+                            JOptionPane.showMessageDialog(null, "Error: jornada se cruza con otra asignada");
+                            return false;
+                        }
+                        inicioB++;
+                    }
+                }
+                return true;
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Error agregando recordatorio");
+                return false;
+            }
+
+
+
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "Error en las fechas: " + ex);
+            return false;
         }
     }
 
@@ -208,7 +346,7 @@ public class Horarios extends javax.swing.JFrame {
         }
     }
 
-    public void validarSoloLetras(KeyEvent evt) {
+    public void validarCamposSoloLetras(KeyEvent evt) {
         // TODO add your handling code here:
         char Alfab[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'ñ', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -283,6 +421,11 @@ public class Horarios extends javax.swing.JFrame {
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
+        fmtHoraFin.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                fmtHoraFinKeyTyped(evt);
+            }
+        });
 
         txtNombre.setEnabled(false);
 
@@ -459,11 +602,15 @@ public class Horarios extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAgregarActionPerformed
-        if (validarCampos()) {
+        if (validarCampos() && validarHoraFinMayorHoraIni()) {
             if (rdbJornada.isSelected()) {
-                agregarJornada();
+                if (validarHorasJornada()) {
+                    agregarJornada();
+                }
             } else {
-                agregarRecordatorio();
+                if (validarHoraRecordatorio()) {
+                    agregarRecordatorio();
+                }
             }
         }
 
@@ -477,7 +624,7 @@ public class Horarios extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
     private void txtDescripcionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDescripcionKeyTyped
-        validarSoloLetras(evt);
+        validarCamposSoloLetras(evt);
 
     }//GEN-LAST:event_txtDescripcionKeyTyped
 
@@ -494,6 +641,11 @@ public class Horarios extends javax.swing.JFrame {
     private void fmtHoraIniKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fmtHoraIniKeyTyped
         validarEscrituraHoras(evt, fmtHoraIni);
     }//GEN-LAST:event_fmtHoraIniKeyTyped
+
+    private void fmtHoraFinKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fmtHoraFinKeyTyped
+        // TODO add your handling code here:
+        validarEscrituraHoras(evt, fmtHoraFin);
+    }//GEN-LAST:event_fmtHoraFinKeyTyped
 
     /**
      * @param args the command line arguments
