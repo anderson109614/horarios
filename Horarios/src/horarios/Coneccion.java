@@ -45,7 +45,7 @@ public class Coneccion {
 //JOptionPane.showMessageDialog(null, "Conexxion Exitosa");
         } catch (Exception ex) {
             //JOptionPane.showMessageDialog(null, ex);
-            JOptionPane.showMessageDialog(null, "Error en la coneccion");
+            JOptionPane.showMessageDialog(null, "Error en la conexión");
         }
         return conecct;
 
