@@ -14,6 +14,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -46,6 +47,7 @@ public class Principal extends javax.swing.JFrame  {
         instanciarTray();
         this.setLocationRelativeTo(null);
         noCerrer();
+         
   
     }
 public void noCerrer(){
@@ -114,6 +116,8 @@ private ActionListener acciones = new ActionListener() {
         menuDes = new java.awt.PopupMenu();
         menuAbrir = new java.awt.MenuItem();
         BtmOcultar = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         menuDes.setLabel("popupMenu1");
 
@@ -139,21 +143,41 @@ private ActionListener acciones = new ActionListener() {
             }
         });
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("jLabel1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(150, 150, 150)
-                .addComponent(BtmOcultar)
-                .addContainerGap(183, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(BtmOcultar)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 170, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addGap(147, 147, 147))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(190, Short.MAX_VALUE)
-                .addComponent(BtmOcultar)
-                .addGap(87, 87, 87))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(BtmOcultar)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 179, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(75, 75, 75))
         );
 
         pack();
@@ -181,6 +205,17 @@ private ActionListener acciones = new ActionListener() {
        }
         t.start(); 
     }//GEN-LAST:event_formWindowOpened
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            // TODO add your handling code here:
+            cc.generarArchivos("1801");
+            cc.datosTemporales();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -219,6 +254,8 @@ private ActionListener acciones = new ActionListener() {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtmOcultar;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private java.awt.MenuItem menuAbrir;
     private java.awt.PopupMenu menuDes;
     // End of variables declaration//GEN-END:variables
